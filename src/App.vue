@@ -1,29 +1,47 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
+<a-spin :spinning="spinning">
+  <a-layout>
+    <Header />
+    <a-layout-content>
+      <router-view/>
+    </a-layout-content>
+    <Footer />
+    <BackTop />
+  </a-layout>
+</a-spin>
 </template>
 
-<style lang="less">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+// @ is an alias to /src
+import Header from '@/components/Header.vue'
+import Footer from '@/components/Footer.vue'
+import BackTop from '@/components/BackTop.vue'
+
+export default {
+  name: 'home',
+  components: {
+    Header,
+    Footer,
+    BackTop
+  },
+  computed:{
+    spinning(){
+      return this.$store.state.loading
     }
   }
+}
+</script>
+
+<style lang="less">
+.ant-layout-content {
+  max-width: 800px;
+  width: 100%;
+  margin: 10px auto;
+  padding: 20px;
+  background: #fff;
+  min-height: 600px;
+}
+img {
+    width: 100%;
 }
 </style>
