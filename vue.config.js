@@ -10,5 +10,6 @@ module.exports = {
         javascriptEnabled: true
       }
     }
-  }
+  },
+  publicPath: 'https://static.autre.cn/usr/uploads/',
 }
