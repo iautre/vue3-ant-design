@@ -7,27 +7,26 @@
 export default {
   data () {
     return {
-      
     }
   },
-  computed:{
-    pageData(){
+  computed: {
+    pageData () {
       return this.$store.state.pageData
     },
-    loading(){
+    loading () {
       return this.$store.state.loading
     }
   },
-   methods:{
-    getData:function(){
-      this.$store.dispatch('setLoading',true)
-      this.$store.dispatch('getPageData',this.$route.params.page_id)
+  methods: {
+    getData: function () {
+      this.$store.dispatch('setLoading', true)
+      this.$store.dispatch('getPageData', this.$route.params.page_id)
     }
   },
-  mounted:function(){
+  mounted: function () {
     this.getData()
   },
-  watch:{
+  watch: {
     '$route': 'getData'
   }
 }

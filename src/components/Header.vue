@@ -12,27 +12,27 @@ export default {
     Menu
   },
   mounted: function() {
-    var url = window.location.href;
+    var url = window.location.href
     if (url.indexOf("https") < 0 || url.indexOf("www.autre.me") > 0) {
-      url = url.replace("http:", "https:");
-      url = url.replace("www.autre.me", "autre.me");
+      url = process.env.NODE_ENV === 'development' ? url : url.replace("http:", "https:")
+      url = url.replace("www.autre.me", "autre.me")
       window.location.replace(url);
     }
-    let ua = navigator.userAgent.toLowerCase();
+    let ua = navigator.userAgent.toLowerCase()
     if (url.indexOf("autre.cn") > 0 && !/micromessenger/.test(ua)) {
-      url = url.replace("www.autre.cn", "autre.me");
-      url = url.replace("autre.cn", "autre.me");
-      window.location.replace(url);
+      url = url.replace("www.autre.cn", "autre.me")
+      url = url.replace("autre.cn", "autre.me")
+      window.location.replace(url)
     }
   },
   computed: {
     webTitle() {
-      return this.$store.state.webTitle;
+      return this.$store.state.webTitle
     }
   },
   watch: {
     webTitle(newName, oldName) {
-      this.common.setTitle(newName);
+      this.common.setTitle(newName)
     }
   }
 };

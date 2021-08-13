@@ -11,5 +11,14 @@ module.exports = {
       }
     }
   },
-  publicPath: 'https://static.autre.cn/usr/uploads/',
+  publicPath: process.env.NODE_ENV === 'development' ? '/' : 'https://static.autre.cn/usr/uploads/',
+  pwa: {
+    iconPaths: {
+      favicon32: 'favicon.ico',
+      favicon16: 'favicon.ico',
+      appleTouchIcon: 'favicon.ico',
+      maskIcon: 'favicon.ico',
+      msTileImage: 'favicon.ico'
+    }
+  }
 }
