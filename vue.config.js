@@ -11,7 +11,7 @@ module.exports = {
       }
     }
   },
-  publicPath: process.env.NODE_ENV === 'development' ? '/' : 'https://static.autre.cn/usr/uploads/',
+  publicPath: process.env.NODE_ENV === 'development' ? '/' : 'https://static.autre.cn/me/',
   pwa: {
     iconPaths: {
       favicon32: 'favicon.ico',
