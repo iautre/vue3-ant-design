@@ -1,47 +1,35 @@
 <template>
-<a-spin :spinning="spinning">
+  <!-- <HeaderImg /> -->
   <a-layout>
-    <Header />
-    <a-layout-content>
-      <router-view/>
-    </a-layout-content>
-    <Footer />
-    <BackTop />
+    <div style="max-width: 900px; width:100%; margin: 0 auto; background: #fff;" class="session-main">
+      <Header></Header>
+      <a-layout-content style="padding:0 24px;min-height: calc(100vh - 230px);">
+        <router-view :key="key"/>
+      </a-layout-content>
+      <a-divider />
+      <Footer style="background: #fff;"></Footer>
+    </div>
   </a-layout>
-</a-spin>
 </template>
-
-<script>
-// @ is an alias to /src
+<script setup lang="ts">
+import { defineComponent, ref } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
 import Header from '@/components/Header.vue'
+import Breadcrumb from '@/components/Breadcrumb.vue'
 import Footer from '@/components/Footer.vue'
-import BackTop from '@/components/BackTop.vue'
-
-export default {
-  name: 'home',
-  components: {
-    Header,
-    Footer,
-    BackTop
-  },
-  computed:{
-    spinning(){
-      return this.$store.state.loading
-    }
-  }
-}
+import { computed } from '@vue/reactivity'
+import HeaderImg from './components/HeaderImg.vue'
+const route = useRoute()
+const key = computed(()=>route.fullPath)
 </script>
-
-<style lang="less">
-.ant-layout-content {
-  max-width: 800px;
-  width: 100%;
-  margin: 10px auto;
-  padding: 20px;
-  background: #fff;
-  min-height: 600px;
-}
+<style>
 img {
-    width: 100%;
+  width: 100%;
+}
+@media screen and (min-width: 900px) {
+  .session-main{
+    margin-top: 24px!important;
+    margin-bottom: 24px!important;
+  }
 }
 </style>

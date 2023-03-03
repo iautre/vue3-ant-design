@@ -1,8 +1,6 @@
 import axios from 'axios'
-import Vue from 'vue'
 
-export function fetch(url, params) {
-  if(!url) return
+export function fetch(url:string, params:any):Promise<any> {
   return new Promise((resolve, reject) => {
     axios({
       url: url,
@@ -23,10 +21,10 @@ export function fetch(url, params) {
 
 export default {
   // 获取我的页面的后台数据
-  getData(params) {
+  getData(params:any):Promise<any> {
     return fetch('https://autre.cn/api/post',params);
   },
-  login(params){
+  login(params:any):Promise<any>{
     return fetch('https://autre.cn/api/login',params);
   }
 }

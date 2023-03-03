@@ -4,25 +4,12 @@
   </div>
 </template>
 
-<script>
-export default {
-  methods: {
-    login () {
-      if (this.$route.query.code) {
-        var code = this.$route.query.code
-        localStorage.setItem('autre_user_login_code', code)
-        // this.$store.dispatch('getuserInfo',code)
-        window.close()
-      }
-    }
-  },
-  mounted: function () {
-    if (this.$store.state.userInfo) {
-      this.$router.push({
-        path: '/'
-      })
-    }
-    this.login()
-  }
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+const route = useRoute()
+if (route.query.code) {
+    const code = route.query.code as string
+    localStorage.setItem('autre_user_login_code', code)
+    window.close()
 }
 </script>

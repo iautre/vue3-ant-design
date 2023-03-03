@@ -1,37 +1,25 @@
 <template>
-  <div class="page_content">
-    <div v-html="common.markdown(pageData.text)"/>
-  </div>
+    <a-card :bordered="false" :loading="!data.title">
+        <a-card-meta :title="data.title" style="margin-bottom:24px;">
+        </a-card-meta>
+        <v-md-preview :text="data.text"></v-md-preview>
+        <!-- <v-md-preview-html :html="postStore.data.text"></v-md-preview-html> -->
+    </a-card>
 </template>
-<script>
-export default {
-  data () {
-    return {
-    }
-  },
-  computed: {
-    pageData () {
-      return this.$store.state.pageData
-    },
-    loading () {
-      return this.$store.state.loading
-    }
-  },
-  methods: {
-    getData: function () {
-      this.$store.dispatch('setLoading', true)
-      this.$store.dispatch('getPageData', this.$route.params.page_id)
-    }
-  },
-  mounted: function () {
-    this.getData()
-  },
-  watch: {
-    '$route': 'getData'
-  }
-}
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import usePostStore from '../store/post/index'
+const route = useRoute()
+// 使用 Store
+const postStore = usePostStore()
+const data = computed<{title:string|null;text:string|null;}>(():{title:string|null;text:string|null;} => postStore.page)
+// 使用actions
+postStore.getPage(route.params.slug as string)
 </script>
-
-<style scoped lang="less">
-
+<style>
+.ant-card-body {
+    padding-left: 0;
+    padding-right: 0;
+}
 </style>

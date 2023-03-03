@@ -1,117 +1,109 @@
 <template>
-  <div>
-    <a-list
-      v-if="comments.length"
-      :dataSource="comments"
-      :header="`${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}`"
-      itemLayout="horizontal"
-      :loading="commentLoading"
-    >
-      <a-list-item slot="renderItem" slot-scope="item, index">
-          <a-comment
-          :author="item.author"
-          :avatar="item.avatar"
-        >
-          <p slot="content"><em class="parent-author" v-if="item.parent!='0'">@{{item.parentInfo.author}}</em> {{item.text}}</p>
-          <a-tooltip slot="datetime" :title="common.formatDate(item.created)">
-            <span>{{common.formatDate(item.created)}}</span>
-            <span> {{common.commentstatus(item.status)}}</span>
-          </a-tooltip>
+  <div v-if="show!==0">
+  <a-list :data-source="comments" item-layout="vertical">
+    <template #header>
+      {{ `${comments.length} ${comments.length > 1 ? 'replies' : 'reply'}` }}
+      <a-comment v-if="replyId === 0">
+        <template #avatar>
+          <a-avatar :src="replyavatar" :alt="replyName" />
+        </template>
+        <template #content>
+          <a-form-item>
+            <a-textarea v-model:value="value" :rows="4" />
+          </a-form-item>
+          <a-form-item>
+            <a-button html-type="submit" :loading="submitting" type="primary" @click="handleSubmit">
+              {{submitBtnName}}
+            </a-button>
+          </a-form-item>
+        </template>
+      </a-comment>
+    </template>
+    <template #renderItem="{ item }">
+      <a-list-item>
+        <a-comment style="width:100%;" :author="item.author" :avatar="item.avatar" :content="item.text" :datetime="item.datetime">
+          <template #actions>
+            <span key="comment-nested-reply-to" @click="replyTo(item.coid)">Reply to</span>
+          </template>
+          <a-comment v-if="replyId === item.coid">
+            <template #avatar>
+              <a-avatar :src="replyavatar" :alt="replyName" />
+            </template>
+            <template #content>
+              <a-form-item>
+                <a-textarea v-model:value="value" :rows="4" />
+              </a-form-item>
+              <a-form-item>
+                <a-button html-type="submit" :loading="submitting" type="primary" @click="handleSubmit">
+                  {{submitBtnName}}
+                </a-button>
+              </a-form-item>
+            </template>
+          </a-comment>
+          <a-list :data-source="item.subComments" item-layout="vertical">
+            <template #renderItem="{ item:subItem }">
+              <a-list-item>
+                <a-comment style="width:100%;" :author="subItem.author" :avatar="subItem.avatar" :content="subItem.text" :datetime="subItem.datetime">
+                  <template #actions>
+                    <span key="comment-nested-reply-to" @click="replyTo(subItem.coid)">Reply to</span>
+                  </template>
+                  <a-comment v-if="replyId === subItem.coid">
+                    <template #avatar>
+                      <a-avatar :src="replyavatar" :alt="replyName" />
+                    </template>
+                    <template #content>
+                      <a-form-item>
+                        <a-textarea v-model:value="value" :rows="4" />
+                      </a-form-item>
+                      <a-form-item>
+                        <a-button html-type="submit" :loading="submitting" type="primary" @click="handleSubmit">
+                          {{submitBtnName}}
+                        </a-button>
+                      </a-form-item>
+                    </template>
+                  </a-comment>
+                </a-comment>
+              </a-list-item>
+            </template>
+          </a-list>
         </a-comment>
       </a-list-item>
-    </a-list>
-    <a-comment>
-      <a-avatar
-        slot="avatar"
-        :src="userInfoavatar"
-        :alt="userInfoname"
-      />
-      <div slot="content">
-        <a-form-item>
-          <a-textarea :rows="4" @change="handleChange" :value="value" ></a-textarea>
-        </a-form-item>
-        <a-form-item>
-          <a-button
-            htmlType="submit"
-            :loading="submitting"
-            @click="handleSubmit"
-            type="primary"
-          >
-            评论
-          </a-button>
-        </a-form-item>
-      </div>
-    </a-comment>
-  </div>
+    </template>
+  </a-list>
+</div>
 </template>
-<script>
-import moment from 'moment'
-export default {
-  data () {
-    return {
-      value: '',
-      moment,
-    }
-  },
-  computed:{
-    comments(){
-      return this.$store.state.comments
-    },
-    submitting(){
-      return this.$store.state.submitting
-    },
-    userInfoavatar(){
-      return this.$store.state.userInfo!=null?this.$store.state.userInfo.avatar:''
-    },
-    userInfoname(){
-      return this.$store.state.userInfo!=null?this.$store.state.userInfo.name:''
-    },
-    commentLoading(){
-      return this.$store.state.commentLoading
-    }
-  },
-  methods: {
-    handleSubmit() {
-      if(!this.$store.state.userInfo){
-        this.common.login(this)
-        return
-      }
-      if (!this.value) {
-        return
-      }
-      this.$store.dispatch('setsubmitting',true)
-      var param = {
-        text: this.value,
-        postId: this.$route.params.post_id,
-        comment: {
-          author: this.userInfoname,
-          avatar: this.userInfoavatar,
-          content: this.value,
-          datetime: moment().fromNow(),
-        }
-      }
-      this.$store.dispatch('setCommentLoading',true)
-      this.$store.dispatch('submitComment',param)
-      this.value = ''
-    },
-    handleChange(e) {
-      this.value = e.target.value
-    },
-    getData:function(){
-      var param ={
-        pageIndex: 1,
-        pageSize: 20,
-         postId: this.$route.params.post_id
-      }
-      this.$store.dispatch('setCommentLoading',true)
-      this.$store.dispatch('getComments',param)
-    }
-  },
-  mounted:function(){
-    this.getData()
-  },
-  watch:{
-    '$route': 'getData'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import useCommentStore from '../store/post/comment'
+import useUserStore from '../store/user/index'
+import login from '../common/login'
+const show = ref<number>(0)
+
+const commentStore = useCommentStore()
+const comments = computed(() => commentStore.comments)
+const route = useRoute()
+commentStore.getComments({ postId: route.params.id })
+const submitting = computed(() => commentStore.submitting)
+const userStore = useUserStore()
+const submitBtnName = computed(()=>userStore.userInfo ? '提交': '登陆')
+const replyName = computed(()=>userStore.userInfo ? userStore.userInfo.name : '未登陆')
+const replyavatar = computed(()=> userStore.userInfo ? userStore.userInfo.avatar : 'https://joeschmoe.io/api/v1/random')
+const value = ref<string>('');
+const replyId = ref<number>(0)
+const handleSubmit = () => {
+  if (!userStore.userInfo){
+    login()
   }
-}
+  if (!value.value) {
+    return;
+  }
+  commentStore.submitComment({coid: replyId, postId: route.params.id, text: value.value})
+};
+const replyTo = (idn: number) => {
+  replyId.value = idn
+};
 </script>
+
+
+

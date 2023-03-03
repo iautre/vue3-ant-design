@@ -1,100 +1,77 @@
 <template>
   <div>
-    <a-list itemLayout="vertical" size="large" :dataSource="listData">
-      <a-list-item slot="renderItem" slot-scope="item, index" key="item.title">
-        <a-list-item-meta>
-          <router-link :to="item.pathinfo" slot="title">{{item.title}}</router-link>
-        </a-list-item-meta>
-        <img
-          width="100%"
-          alt="logo"
-          v-if="item.thumb.firstimg"
-          :src="common.replaceFirstImgUrl(item.thumb.firstimg)"
-        />
-        <div slot="actions" class="icons-list">
-          <a-icon type="edit" />
-          {{common.formatDate(item.created)}}
-          <a-icon type="bars" />
-          <template v-for="cate in item.categories">{{cate.name}}</template>
-          <template v-if="item.thumb.gps">
-            <a-icon type="environment" />
-            {{ item.thumb.gps }}
+    <a-list itemLayout="vertical" size="large" :dataSource="postStore.list">
+      <template #renderItem="{ item }">
+        <a-list-item style="padding: 24px 0;">
+          <a-list-item-meta>
+            <template #title>
+              <router-link :to="item.pathinfo">{{ item.title }}</router-link>
+            </template>
+            <template #description>
+              <router-link :to="item.pathinfo">
+                <a-card hoverable style="width: 100%" v-if="item.thumb.firstimg">
+                  <template #cover>
+                    <img :src="item.thumb.firstimg+'!meindex'" />
+                  </template>
+                </a-card>
+              </router-link>
+            </template>
+          </a-list-item-meta>
+          <template #actions>
+            <div>
+              <edit-outlined />
+              {{ $formatDate(item.created) }}
+            </div>
+            <div>
+              <unordered-list-outlined />
+              <span style="margin-left:5px;" v-for="cate in item.categories"> {{ cate.name }} </span>
+            </div>
+            <template v-if="item.thumb.gps">
+              <environment-outlined />
+              {{ item.thumb.gps }}
+            </template>
           </template>
-        </div>
-      </a-list-item>
+        </a-list-item>
+      </template>
+      <template #footer>
+        <a-space align="center">
+        <router-link v-if="route.params.page" :to="prePage"><a-button>上一页</a-button></router-link>
+        <router-link :to="nextPage"><a-button>下一页</a-button></router-link>
+        </a-space>
+      </template>
     </a-list>
-    <router-link :to="nextPage">下一页</router-link>
+    <!-- <router-link :to="nextPage">下一页</router-link> -->
   </div>
 </template>
-<script>
-import Spin from "@/components/Spin.vue";
-export default {
-  components: {
-    Spin
-  },
-  data() {
-    return {
-      actions: [
-        { type: "star-o", text: "156" },
-        { type: "like-o", text: "156" },
-        { type: "message", text: "2" }
-      ],
-      pageParam: {
-        pageSize: 8,
-        page: 1
-      }
-    };
-  },
-  computed: {
-    listData() {
-      return this.$store.state.listData;
-    },
-    pagination() {
-      return {
-        onChange: page => {
-          this.pageParam.page = page;
-          this.getData();
-        },
-        pageSize: this.pageParam.pageSize
-      };
-    },
-    nextPage() {
-      return "/page/" + (this.pageParam.page + 1);
-    },
-    routrePage() {
-      return parseInt(this.$route.params.page);
-    }
-  },
-  methods: {
-    getData: function() {
-      if (this.routrePage) {
-        this.pageParam.page = this.routrePage;
-      }
-      this.$store.dispatch("setLoading", true);
-      this.$store.dispatch("getListData", this.pageParam);
-    }
-  },
-  mounted: function() {
-    this.getData();
-  },
-  watch: {
-    $route: "getData"
-  }
-};
-</script>
+<script setup lang="ts">
+import { RouterLink, useRoute } from 'vue-router'
+import usePostStore from '../store/post/index'
+import { EditOutlined, UnorderedListOutlined, EnvironmentOutlined } from '@ant-design/icons-vue'
+import { computed } from '@vue/reactivity'
+import $formatDate from '../common/formatDate'
 
-<style scoped lang="less">
-.content-list {
-  width: 100%;
-}
-.icons-list {
-  margin-left: -8px;
-}
-.icons-list .anticon {
-  margin-left: 8px;
-  margin-right: 6px;
-}
-.ant-list-item-meta {
-  margin-bottom: 0;
-}
-</style>
+// 使用 Store
+const postStore = usePostStore()
+const route = useRoute()
+// 使用actions
+postStore.getList({ page: parseInt(route.params.page as string) })
+const nextPage = computed<string>(():string =>{
+  if (route.params.page){
+    const page: string = route.params.page as string
+    const pageInt = parseInt(page) + 1
+    return '/page/' +  pageInt
+  }
+  return '/page/2'
+})
+const prePage = computed<string>(():string =>{
+  if (route.params.page){
+    const page: string = route.params.page as string
+    if (page === '2'){
+      return '/'
+    }
+    const pageInt = parseInt(page) - 1
+    return '/page/' +  pageInt
+  }
+  return ''
+})
+</script>
