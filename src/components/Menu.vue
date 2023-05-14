@@ -13,6 +13,9 @@
       <a-menu-item key="100flower">
         <router-link to="/100flower">百花</router-link>
       </a-menu-item>
+      <a-menu-item key="bh4ghm">
+        <a href="https://autre.cn/bh4ghm" target="_blank">空中通联</a>
+      </a-menu-item>
       <!-- <a-menu-item key="login">
         <a v-if="!userStore.userInfo" v-on:click="$login">登录</a>
         <a v-if="userStore.userInfo" :href="userStore.userInfo.profile_url" target="_blank">
